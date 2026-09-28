@@ -1,0 +1,11 @@
+{
+  "name": "lobbyboi-workspace",
+  "private": true,
+  "packageManager": "pnpm@9.13.2",
+  "scripts": {
+    "dev": "pnpm --filter arena dev",
+    "build": "pnpm -r build",
+    "test": "pnpm --filter lobbyboi test",
+    "typecheck": "pnpm -r typecheck"
+  }
+}

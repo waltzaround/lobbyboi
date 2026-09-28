@@ -1,0 +1,73 @@
+{
+  "name": "lobbyboi",
+  "version": "0.1.0",
+  "description": "Multiplayer rooms for Cloudflare Durable Objects: lobbies, quick-match, authoritative netcode and bots.",
+  "license": "MIT",
+  "type": "module",
+  "keywords": [
+    "cloudflare",
+    "durable-objects",
+    "multiplayer",
+    "websocket",
+    "netcode",
+    "gamedev",
+    "lobby",
+    "matchmaking"
+  ],
+  "exports": {
+    "./server": {
+      "types": "./src/server/index.ts",
+      "default": "./src/server/index.ts"
+    },
+    "./client": {
+      "types": "./src/client/index.ts",
+      "default": "./src/client/index.ts"
+    },
+    "./protocol": {
+      "types": "./src/protocol.ts",
+      "default": "./src/protocol.ts"
+    }
+  },
+  "publishConfig": {
+    "exports": {
+      "./server": {
+        "types": "./dist/server/index.d.ts",
+        "default": "./dist/server/index.js"
+      },
+      "./client": {
+        "types": "./dist/client/index.d.ts",
+        "default": "./dist/client/index.js"
+      },
+      "./protocol": {
+        "types": "./dist/protocol.d.ts",
+        "default": "./dist/protocol.js"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepack": "cp ../../README.md ../../LICENSE . && pnpm build"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "0.22.0",
+    "@cloudflare/workers-types": "^5.20260928.1",
+    "typescript": "^5.9",
+    "vitest": "^4.1.0",
+    "wrangler": "^4.142.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/waltzaround/lobbyboi.git",
+    "directory": "packages/lobbyboi"
+  }
+}

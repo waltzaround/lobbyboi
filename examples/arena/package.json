@@ -1,0 +1,21 @@
+{
+  "name": "arena",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/setup.mjs && concurrently -k -n worker,vite -c blue,magenta \"wrangler dev --port 8787\" \"vite\"",
+    "build": "vite build",
+    "typecheck": "tsc -b",
+    "deploy": "vite build && wrangler deploy"
+  },
+  "dependencies": {
+    "lobbyboi": "workspace:*"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260928.1",
+    "concurrently": "^10.0.5",
+    "typescript": "^5.9",
+    "vite": "^8",
+    "wrangler": "^4.142.0"
+  }
+}

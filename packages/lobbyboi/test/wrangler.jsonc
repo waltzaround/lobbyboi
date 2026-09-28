@@ -1,0 +1,13 @@
+{
+  "name": "lobbyboi-test",
+  "main": "./fixture/worker.ts",
+  "compatibility_date": "2026-08-20",
+  "durable_objects": {
+    "bindings": [
+      { "name": "ROOMS", "class_name": "TestRoom" },
+      { "name": "LOBBY", "class_name": "LobbyDirectory" }
+    ]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["TestRoom", "LobbyDirectory"] }],
+  "vars": { "SESSION_SECRET": "test-secret-that-is-long-enough" }
+}
