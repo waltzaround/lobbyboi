@@ -2,6 +2,8 @@
 
 Multiplayer rooms for Cloudflare Durable Objects: lobbies, quick-match, authoritative netcode and bots, in one small TypeScript package.
 
+**[lobbyboi.walt.online](https://lobbyboi.walt.online)** · [Play the demo](https://lobbyboi.walt.online/play/)
+
 You write the game (`createGame`, `step` and `view`). lobbyboi runs everything around it:
 
 - **Rooms and lobbies**: shareable room codes, a public room list, quick-match, ready-up, host controls, kick, chat
@@ -57,6 +59,8 @@ pnpm dev
 ```
 
 Open the Vite URL, create a room and hit Start. The example ships with three bots. To play against yourself, open a private window, which gets a separate session.
+
+The project website lives in [`site`](site): a landing page plus Coin Rush at `/play/`, deployed as one Worker. Run it with `pnpm site`, and deploy it with `pnpm run deploy`.
 
 ## Setup
 
@@ -198,16 +202,6 @@ pnpm test
 - **Binary encoding.** It's JSON everywhere; deltas keep it small, but a MessagePack or bit-packed codec would plug in at `send`.
 - **Regions and skill-based matching.** The directory is one global object, and quick-match picks the fullest room.
 - **Spectators.**
-
-## Where this came from
-
-lobbyboi is extracted from patterns that shipped in a handful of browser games:
-
-- **Slopdivers**: directory leases, reserve-then-join quick-match, slot holds, hibernation attachments, the delta snapshot codec and rate limiting
-- **Pew Pew**: the interpolation buffer and clock-offset estimation
-- **Command Prompt**: host migration, ready reset on settings change, and the protocol version handshake
-- **Kapoot**: socket tags, alarm-driven phases and unambiguous room codes
-- **Block Raid**: signed session cookies and create/join semantics
 
 ## License
 

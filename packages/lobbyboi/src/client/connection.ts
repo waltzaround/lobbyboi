@@ -219,7 +219,6 @@ export class RoomConnection<State = Record<string, unknown>, Input = unknown> {
   /**
    * Offset = local - server, from the sample with the least delay. It drifts
    * up slowly so a lasting latency increase is absorbed without a jump.
-   * From fieldshooter2's smooth.js.
    */
   private observeClock(serverTime: number, rtt: number) {
     const sample = Date.now() - rtt / 2 - serverTime;

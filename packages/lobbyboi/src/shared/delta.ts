@@ -1,4 +1,4 @@
-// Snapshot delta codec, generalised from slopdivers' delta-v2 protocol.
+// Snapshot delta codec.
 //
 // A snapshot state is a plain object. Top-level fields are diffed by their JSON
 // fingerprint. Top-level arrays whose items all have a string `id` are treated

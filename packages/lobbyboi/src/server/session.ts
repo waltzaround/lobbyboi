@@ -1,7 +1,6 @@
 // Signed guest sessions. The Worker issues an HMAC-signed token, stores it in
 // an HttpOnly cookie and passes the verified identity to rooms in a header, so
 // a room never has to trust anything the client says about who it is.
-// Ported from slopdivers/src/server/auth.ts and isometric's session.ts.
 
 export interface Identity {
   id: string;

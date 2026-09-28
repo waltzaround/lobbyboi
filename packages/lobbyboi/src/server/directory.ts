@@ -3,7 +3,6 @@
 // Listings are leases, not facts. Each room re-publishes itself while it has
 // people in it; a room that crashes, is evicted or is simply forgotten drops off
 // the list when its lease runs out. Nothing ever has to clean up after a room.
-// Pattern from slopdivers' Directory and rts-test's LobbyDirectory.
 
 import { DurableObject } from 'cloudflare:workers';
 import type { Listing } from '../protocol.js';

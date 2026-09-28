@@ -1,14 +1,15 @@
 {
-  "name": "arena",
+  "name": "site",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node scripts/setup.mjs && concurrently -k -n worker,vite -c blue,magenta \"wrangler dev --port 8787\" \"vite\"",
+    "dev": "node scripts/setup.mjs && concurrently -k -n worker,vite -c blue,magenta \"wrangler dev --port 8799 --inspector-port 9239\" \"vite --port 5180\"",
     "build": "vite build",
     "typecheck": "tsc -b",
     "deploy": "vite build && wrangler deploy"
   },
   "dependencies": {
+    "arena": "workspace:*",
     "lobbyboi": "workspace:*"
   },
   "devDependencies": {
@@ -17,10 +18,5 @@
     "typescript": "^5.9",
     "vite": "^8",
     "wrangler": "^4.142.0"
-  },
-  "exports": {
-    "./worker": "./src/worker.ts",
-    "./client": "./src/client/main.ts",
-    "./game": "./src/game.ts"
   }
 }

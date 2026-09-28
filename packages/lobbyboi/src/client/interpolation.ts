@@ -1,5 +1,4 @@
-// Turns 10–30 Hz snapshots into smooth 60+ fps motion. Generalised from
-// fieldshooter2's smooth.js.
+// Turns 10–30 Hz snapshots into smooth 60+ fps motion.
 //
 // Remote entities are drawn `delayMs` in the past and interpolated between
 // the two snapshots around that moment, so uneven packet arrival never shows

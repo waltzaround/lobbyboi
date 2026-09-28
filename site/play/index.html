@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coin Rush · lobbyboi demo</title>
+    <meta name="description" content="A multiplayer browser game built on lobbyboi and Cloudflare Durable Objects." />
+    <link rel="icon" href="/favicon.svg" />
+  </head>
+  <body>
+    <main id="home" class="panel">
+      <h1>Coin Rush</h1>
+      <p class="muted">Grab coins. Dash into people to knock theirs loose. A <a href="/">lobbyboi</a> demo.</p>
+      <label>Name <input id="name" maxlength="20" placeholder="Player" autocomplete="nickname" /></label>
+      <div class="row">
+        <button id="quick" class="primary">Quick match</button>
+        <button id="create">Create room</button>
+      </div>
+      <form id="join-form" class="row">
+        <input id="code" maxlength="12" placeholder="Room code" autocapitalize="characters" />
+        <button>Join</button>
+      </form>
+      <h2>Open rooms</h2>
+      <ul id="rooms" class="list"></ul>
+    </main>
+
+    <main id="room" class="panel" hidden>
+      <header class="row between">
+        <div>
+          <h1 id="room-name"></h1>
+          <p class="muted">Code <b id="room-code" class="code"></b> <button id="copy" class="link">copy invite</button></p>
+        </div>
+        <button id="leave">Leave</button>
+      </header>
+      <ul id="players" class="list"></ul>
+      <div class="row settings">
+        <label>Bots
+          <select id="bots">
+            <option>0</option><option>1</option><option>2</option><option>3</option>
+            <option>4</option><option>5</option><option>6</option><option>7</option>
+          </select>
+        </label>
+        <label>Round
+          <select id="length"><option value="30">30s</option><option value="60">60s</option><option value="90">90s</option></select>
+        </label>
+        <label class="check"><input id="public" type="checkbox" /> Listed</label>
+      </div>
+      <div class="row">
+        <button id="ready">Ready</button>
+        <button id="start" class="primary">Start</button>
+      </div>
+      <div id="chat-log"></div>
+      <form id="chat-form"><input id="chat" maxlength="200" placeholder="Say something" /></form>
+      <div id="countdown" hidden></div>
+    </main>
+
+    <main id="game" hidden>
+      <div id="hud"></div>
+      <canvas id="canvas"></canvas>
+      <div id="results" class="panel" hidden></div>
+    </main>
+
+    <div id="toast" hidden></div>
+    <script type="module" src="/src/play.ts"></script>
+  </body>
+</html>
