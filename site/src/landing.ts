@@ -1,6 +1,8 @@
+import { mountConnections } from './connections';
 import { Interpolator } from 'lobbyboi/client';
-import { COIN_RADIUS, RADIUS, WORLD, move, type Coin, type Input, type Runner } from 'arena/game';
 import './landing.css';
+
+mountConnections(document.querySelector<HTMLCanvasElement>('#connections')!, document.querySelector<HTMLButtonElement>('#motion-toggle')!);
 
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const css = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -23,24 +25,76 @@ function highlight(code: HTMLElement) {
   }
   code.innerHTML = html + escapeHtml(text.slice(last));
 }
-document.querySelectorAll<HTMLElement>('pre code').forEach(highlight);
+document.querySelectorAll<HTMLElement>('pre code:not(#local-cmd)').forEach(highlight);
 
-for (const card of document.querySelectorAll<HTMLElement>('[data-tabs]')) {
+for (const [index, card] of [...document.querySelectorAll<HTMLElement>('[data-tabs]')].entries()) {
   const tabs = [...card.querySelectorAll<HTMLButtonElement>('[data-tab]')];
-  for (const tab of tabs)
-    tab.onclick = () => {
-      for (const other of tabs) other.setAttribute('aria-selected', String(other === tab));
-      for (const panel of card.querySelectorAll<HTMLElement>('[data-panel]')) panel.hidden = panel.dataset.panel !== tab.dataset.tab;
+  const panels = [...card.querySelectorAll<HTMLElement>('[data-panel]')];
+  const activate = (tab: HTMLButtonElement) => {
+    for (const other of tabs) {
+      other.setAttribute('aria-selected', String(other === tab));
+      other.tabIndex = other === tab ? 0 : -1;
+    }
+    for (const panel of panels) panel.hidden = panel.dataset.panel !== tab.dataset.tab;
+  };
+  for (const [tabIndex, tab] of tabs.entries()) {
+    const panel = panels.find((candidate) => candidate.dataset.panel === tab.dataset.tab);
+    if (panel) {
+      tab.id ||= `tab-${index}-${tabIndex}`;
+      panel.id ||= `panel-${index}-${tabIndex}`;
+      tab.setAttribute('aria-controls', panel.id);
+      panel.setAttribute('role', 'tabpanel');
+      panel.setAttribute('aria-labelledby', tab.id);
+      panel.tabIndex = 0;
+    }
+    tab.onclick = () => activate(tab);
+    tab.onkeydown = (event) => {
+      const next = event.key === 'ArrowRight' ? (tabIndex + 1) % tabs.length
+        : event.key === 'ArrowLeft' ? (tabIndex + tabs.length - 1) % tabs.length
+        : event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : -1;
+      if (next < 0) return;
+      event.preventDefault();
+      activate(tabs[next]!);
+      tabs[next]!.focus();
     };
+  }
+  if (tabs.length) activate(tabs.find((tab) => tab.getAttribute('aria-selected') === 'true') ?? tabs[0]!);
 }
 
-for (const button of document.querySelectorAll<HTMLButtonElement>('[data-copy]'))
+for (const button of document.querySelectorAll<HTMLButtonElement>('[data-copy]')) {
+  const label = button.textContent;
   button.onclick = async () => {
-    const text = document.querySelector(button.dataset.copy!)?.textContent ?? '';
-    await navigator.clipboard.writeText(text).catch(() => {});
-    button.textContent = 'Copied';
-    setTimeout(() => (button.textContent = 'Copy'), 1500);
+    const target = document.querySelector<HTMLElement>(button.dataset.copy!);
+    if (!target) return;
+    const text = target instanceof HTMLTextAreaElement ? target.value : target.textContent ?? '';
+    const status = document.querySelector<HTMLElement>('#copy-status')!;
+    button.disabled = true;
+    try {
+      await navigator.clipboard.writeText(text);
+      button.textContent = 'Copied!';
+      status.textContent = 'Copied to clipboard. Paste it into your coding agent or terminal.';
+    } catch {
+      target.scrollIntoView({ block: 'center', behavior: reducedMotion ? 'instant' : 'smooth' });
+      if (target instanceof HTMLTextAreaElement) {
+        target.focus();
+        target.select();
+      } else {
+        const range = document.createRange();
+        range.selectNodeContents(target);
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+      }
+      button.textContent = 'Select & copy manually';
+      status.textContent = 'Clipboard access unavailable. Text selected; use your device’s copy command.';
+    } finally {
+      setTimeout(() => {
+        button.textContent = label;
+        button.disabled = false;
+      }, 2500);
+    }
   };
+}
 
 // ---- Only animate what's on screen ------------------------------------------
 
@@ -198,81 +252,6 @@ if (!reducedMotion)
     step = (step + 1) % steps.length;
     steps[step]?.classList.add('active');
   }, 1800);
-
-// ---- Coin Rush, played by bots, behind the call to action ---------------------
-
-const arena = document.querySelector<HTMLCanvasElement>('#arena')!;
-const BOT_COLOURS = ['#ff6b6b', '#4dabf7', '#69db7c', '#b197fc', '#ffa94d', '#63e6be', '#f783ac'];
-const bots: Runner[] = Array.from({ length: 7 }, (_, i) => ({
-  id: String(i),
-  x: 200 + ((i * 173) % 800),
-  y: 150 + ((i * 97) % 500),
-  vx: 0,
-  vy: 0,
-  score: 0,
-  dashLeft: 0,
-  cooldown: 0,
-  dx: 1,
-  dy: 0,
-}));
-let coins: Coin[] = [];
-let coinId = 0;
-const dropCoin = () =>
-  coins.push({ id: `c${coinId++}`, x: 40 + Math.random() * (WORLD.width - 80), y: 40 + Math.random() * (WORLD.height - 80) });
-for (let i = 0; i < 16; i++) dropCoin();
-
-function botInput(me: Runner, t: number): Input {
-  let target: Coin | null = null;
-  let best = Infinity;
-  for (const coin of coins) {
-    const d = Math.hypot(coin.x - me.x, coin.y - me.y);
-    if (d < best) [best, target] = [d, coin];
-  }
-  if (!target) return { x: 0, y: 0, dash: false };
-  const angle = Math.atan2(target.y - me.y, target.x - me.x) + Math.sin(t / 400 + me.id.length) * 0.3;
-  return { x: Math.cos(angle), y: Math.sin(angle), dash: best > 220 && me.cooldown === 0 };
-}
-
-let arenaLast = 0;
-whileVisible(arena, (now) => {
-  const dt = Math.min(0.05, (now - (arenaLast || now)) / 1000);
-  arenaLast = now;
-  if (!reducedMotion) {
-    for (const bot of bots) move(bot, botInput(bot, now), dt * 0.8);
-    for (const bot of bots)
-      coins = coins.filter((coin) => Math.hypot(coin.x - bot.x, coin.y - bot.y) > RADIUS + COIN_RADIUS || (bot.score++, false));
-    while (coins.length < 16) dropCoin();
-  }
-
-  const { ctx, dpr } = fit(arena);
-  const rect = arena.getBoundingClientRect();
-  // Fit the arena's height and sit it on the right, beside the copy. On narrow
-  // screens, cover the band instead.
-  const wide = rect.width > rect.height * 2;
-  const k = (wide ? rect.height / WORLD.height : Math.max(rect.width / WORLD.width, rect.height / WORLD.height)) * dpr;
-  const ox = wide ? arena.width - WORLD.width * k - 24 * dpr : (arena.width - WORLD.width * k) / 2;
-  const oy = (arena.height - WORLD.height * k) / 2;
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.clearRect(0, 0, arena.width, arena.height);
-  ctx.setTransform(k, 0, 0, k, ox, oy);
-  ctx.strokeStyle = '#1f2533';
-  ctx.lineWidth = 1;
-  // Grid across the whole band, so the arena's edges don't show.
-  const left = -ox / k;
-  for (let x = left - (left % 50) - 50; x <= (arena.width - ox) / k; x += 50) line(ctx, x, -oy / k, x, (arena.height - oy) / k);
-  for (let y = 0; y <= WORLD.height; y += 50) line(ctx, left, y, (arena.width - ox) / k, y);
-  ctx.fillStyle = '#ffd34d';
-  for (const coin of coins) circle(ctx, coin.x, coin.y, COIN_RADIUS);
-  for (const bot of bots) {
-    ctx.fillStyle = BOT_COLOURS[Number(bot.id)]!;
-    if (bot.dashLeft > 0) {
-      ctx.globalAlpha = 0.3;
-      circle(ctx, bot.x - bot.vx * 0.04, bot.y - bot.vy * 0.04, RADIUS);
-      ctx.globalAlpha = 1;
-    }
-    circle(ctx, bot.x, bot.y, RADIUS);
-  }
-});
 
 function circle(ctx: CanvasRenderingContext2D, x: number, y: number, r: number) {
   ctx.beginPath();

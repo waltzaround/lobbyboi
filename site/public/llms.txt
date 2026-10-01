@@ -1,0 +1,63 @@
+# lobbyboi
+
+> TypeScript multiplayer rooms for browser games, powered by Cloudflare Workers and Durable Objects. Use this guide when adding multiplayer to an existing game with a coding agent.
+
+## Read first
+
+- API reference and setup: https://github.com/waltzaround/lobbyboi/blob/main/README.md
+- Raw reference: https://raw.githubusercontent.com/waltzaround/lobbyboi/main/README.md
+- Complete working game: https://github.com/waltzaround/lobbyboi/tree/main/examples/arena
+- Package source: https://github.com/waltzaround/lobbyboi/tree/main/packages/lobbyboi
+
+Read the actual reference and example before writing code. If you cannot retrieve them, ask for the source rather than guessing API methods or installation commands.
+
+## Prerequisites and local development
+
+Assume the user is a beginner. Explain that publishing the game requires their own Cloudflare account and provide https://dash.cloudflare.com/sign-up up front. Explain what each tool does. Give setup steps one at a time, say where to run each command and how to recognize success. Let the user complete signup and browser login. Explain that localhost is only their own computer, while deployment creates the address friends can use.
+
+Check Node.js (current LTS; this repo needs 22.12+), Git, the package manager and Wrangler before setup. Explain missing prerequisites to the user.
+
+For this repository:
+
+    npm install -g pnpm@9.13.2
+    git clone https://github.com/waltzaround/lobbyboi.git
+    cd lobbyboi
+    pnpm install
+    pnpm site
+
+Wrangler is already a development dependency; no global install is needed. The site script runs Vite on port 5180 and Wrangler on 8799, creates site/.dev.vars with a random SESSION_SECRET, and prepares the assets directory. Visit http://localhost:5180/play/. For the standalone arena instead, run pnpm dev and use the printed Vite URL. Use a private browser window for a second independent player session.
+
+Local development uses Wrangler's local Worker and Durable Object runtime. Cloudflare signup and login belong to the deployment flow. Docs: https://developers.cloudflare.com/workers/local-development/
+
+For another project, keep its package manager and framework. Inspect the lobbyboi package exports before installation; do not assume it is published on npm. The repository example uses workspace:*; integrate packages/lobbyboi as a local/workspace package if no published release is available. Install Wrangler as a dev dependency if missing, and configure frontend proxying or the client base URL for the Worker.
+
+## All-in-one builders such as Lovable
+
+First identify whether the user is working locally or in a hosted builder. For a hosted builder, start with its account and the user's Cloudflare account. Do not require local Node.js, Git, pnpm or Wrangler just to edit the frontend in the builder. Verify whether the builder can deploy Workers with Durable Objects. If not, explain a code-export or GitHub-sync handoff to a local coding agent and then use the local prerequisites above. Lovable GitHub sync documentation: https://docs.lovable.dev/integrations/github
+
+The frontend can remain hosted by the builder if it supports this integration. A separately hosted lobbyboi Worker requires LobbyClient baseUrl and useToken, explicit allowedOrigins for WebSockets, and HTTP CORS handling including OPTIONS and X-Lobbyboi-Session. Do not assume createLobby supplies all HTTP CORS headers. Keep SESSION_SECRET server-side. Test the actual frontend origin with two independent players before claiming success. The builder's Publish action alone does not provision the multiplayer Worker.
+
+## Implementation checklist
+
+1. Inspect the existing game, build scripts and hosting. Preserve its design and gameplay. Explain any Cloudflare backend requirement before changing deployment architecture.
+2. Extend GameRoom from lobbyboi/server. Implement createGame, step and view. Implement parseInput to validate input. Keep game outcomes authoritative on the server; return only the state each player may see.
+3. Export the room class and LobbyDirectory. Mount createLobby({ rooms: 'ROOMS' }) in a Worker and route non-API requests to static assets. Configure ROOMS and LOBBY Durable Object bindings and SQLite migrations; append migrations without rewriting existing tags.
+4. Use LobbyClient from lobbyboi/client for guest login, create/join by code, quick-match and room events. Use the reference for exact signatures. Add ready-up, countdown, results, play again, connection status and useful error states to the UI.
+5. Add bots where the game supports them. For moving entities, use Interpolator and server time for remote movement; share movement logic for local prediction and reconcile with snapshot ack where needed.
+6. Use a random SESSION_SECRET of at least 16 characters in local .dev.vars. Keep it out of Git and client bundles. Set the production secret separately with Wrangler.
+7. Verify two independent sessions can join the same room, ready up, play, see consistent results and play again. Check disconnect/reconnect and host departure. Run the project's build, typecheck and relevant tests. Report anything unverified.
+
+## Deployment
+
+The user needs a Cloudflare account: https://dash.cloudflare.com/sign-up
+For the repository site, choose a unique Worker name in site/wrangler.jsonc and remove the existing custom-domain routes entry before deploying to the user's workers.dev URL. From the repo root:
+
+    pnpm --filter site exec wrangler login
+    pnpm --filter site exec wrangler secret put SESSION_SECRET
+    pnpm run deploy
+
+The user completes browser login and supplies the secret. Cloudflare usage limits and billing apply. For an existing project, adapt the commands to its own Worker config and deployment script.
+
+## Constraints
+
+The backend requires Cloudflare Workers and Durable Objects. This is a game library, not a hosted multiplayer service. Active match state is in memory; a restart aborts the match and returns players to the lobby. Lobby state persists. One socket is allowed per player; two normal tabs share a session and replace each other. Matchmaking is room capacity based, not skill based. Spectators, deterministic lockstep and hitscan rewind are not built in.

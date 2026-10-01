@@ -1,8 +1,73 @@
 # lobbyboi
 
-Multiplayer rooms for Cloudflare Durable Objects: lobbies, quick-match, authoritative netcode and bots, in one small TypeScript package.
+**Add multiplayer to your browser game.**
 
-**[lobbyboi.walt.online](https://lobbyboi.walt.online)** · [Play the demo](https://lobbyboi.walt.online/play/)
+Copy a prompt into your coding agent to add shared rooms, matchmaking and live game updates. lobbyboi is a small TypeScript library that runs your multiplayer server on Cloudflare Workers and Durable Objects.
+
+**[Website](https://lobbyboi.walt.online)** · [Setup guide](https://lobbyboi.walt.online/#prerequisites) · [Cloudflare games](https://lobbyboi.walt.online/#games) · [Agent guide](https://lobbyboi.walt.online/llms.txt)
+
+## Start with your coding tool
+
+### All-in-one builders: Lovable and similar tools
+
+1. Open your game in your builder. Keep using it for your screens and design.
+2. **[Create a Cloudflare account](https://dash.cloudflare.com/sign-up).** This is where lobbyboi's multiplayer server runs. Publishing your frontend alone does not set up that server.
+3. [Copy the builder prompt from the setup guide](https://lobbyboi.walt.online/#prerequisites). Ask the builder whether it can deploy a Worker with Durable Objects. If it cannot, export or sync the code to GitHub and use a local coding agent for the backend. [Lovable's GitHub sync guide](https://docs.lovable.dev/integrations/github) explains the handoff.
+4. Your frontend can stay with the builder if it supports the integration. Have your agent connect it to the Cloudflare backend and test two independent player sessions before sharing the game.
+
+For separate frontend and backend origins, configure `LobbyClient` with `baseUrl` and `useToken`, set explicit WebSocket `allowedOrigins`, and implement HTTP CORS handling (including preflight and `X-Lobbyboi-Session`). Keep `SESSION_SECRET` on the Worker. `createLobby` does not supply all HTTP CORS headers for you.
+
+### Local development: Cursor, Codex or Claude Code
+
+Open your game's folder in your coding agent. Use the prerequisites below, then paste this prompt:
+
+```text
+Add multiplayer to my browser game using lobbyboi.
+
+Read https://lobbyboi.walt.online/llms.txt first, then follow the linked API reference and working Coin Rush example. Inspect my project and adapt to its framework and package manager.
+
+Assume I am new to development. Before making changes, explain what I need and check what is already installed. Tell me I need a Cloudflare account to put the game online, link to https://dash.cloudflare.com/sign-up, and walk me through signup and login when needed. Explain Node.js, Git, the package manager and Wrangler in plain language. Give me one setup step at a time, with the command, where to run it and what success looks like. Use Wrangler’s local runtime for testing on my computer.
+
+Keep the existing game and visual style. Add guest names, create/join with a room code, quick-match, ready-up, a countdown, results and play again. Use lobbyboi for room management and connections.
+
+Implement server-authoritative game rules with GameRoom and connect the UI with LobbyClient. Validate inputs, handle reconnects, and add bots and smooth remote movement where appropriate.
+
+Set up the Cloudflare Worker, Durable Object bindings and a local session secret. Document production secret setup. Run locally and verify two separate player sessions can join, play, disconnect and rejoin. Run the build and relevant checks, then explain how to deploy and anything still unverified.
+```
+
+The [plain-text agent guide](site/public/llms.txt) includes setup, API links, integration checks and the builder handoff. For an existing game, keep its framework and package manager. The example uses lobbyboi as a workspace package; verify availability before assuming an npm release exists.
+
+## Local prerequisites
+
+- **Node.js**: install a current [LTS release](https://nodejs.org/en/download) (22.12+ for this repo). npm is included.
+- **Git**: [install Git](https://git-scm.com/downloads) to clone the repository.
+- **pnpm**: this workspace uses 9.13.2. Install it with `npm install -g pnpm@9.13.2`.
+- **Wrangler**: included as a dev dependency and installed by `pnpm install`. The dev scripts start its local Worker and Durable Object runtime; no global install is needed.
+- **Cloudflare account**: [sign up](https://dash.cloudflare.com/sign-up) when you want to deploy. The local demo uses the local runtime. See [Cloudflare's local development guide](https://developers.cloudflare.com/workers/local-development/).
+
+For an existing game, keep its package manager. The example uses lobbyboi as a workspace package; don't assume an npm release is available.
+
+## Try the example
+
+[`examples/arena`](examples/arena) is **Coin Rush**, a complete game in about 600 lines. You grab coins and dash into people to knock theirs loose. It has a lobby UI, bots, client-side prediction with reconciliation, and interpolation.
+
+```bash
+git clone https://github.com/waltzaround/lobbyboi.git
+cd lobbyboi
+pnpm install
+```
+
+```bash
+pnpm dev
+```
+
+Open the Vite URL, create a room and hit Start. The example ships with three bots. To play against yourself, open a private window, which gets a separate session.
+
+The project website lives in [`site`](site): a landing page plus Coin Rush at `/play/`, deployed as one Worker. Run it with `pnpm site`, then open `http://localhost:5180` (or `/play/` for the game). The script creates `site/.dev.vars` with a random local secret; keep this file private.
+
+Before deploying your copy, change the Worker name in `site/wrangler.jsonc` and remove the existing custom-domain `routes` entry so you can use your own workers.dev URL. From the repo root, run `pnpm --filter site exec wrangler login`, then `pnpm --filter site exec wrangler secret put SESSION_SECRET` to set a production secret of at least 16 characters. Run `pnpm run deploy` to build and deploy to your Cloudflare account. Local secrets are not uploaded automatically; usage limits and billing apply to your account.
+
+## What lobbyboi handles
 
 You write the game (`createGame`, `step` and `view`). lobbyboi runs everything around it:
 
@@ -45,22 +110,6 @@ room.on('room', (info) => renderLobby(info));      // players, phase, host, sett
 room.on('snapshot', ({ time, state }) => others.push(time, state.players));
 setInterval(() => room.sendInput(readKeys()), 1000 / 30);
 ```
-
-## Try the example
-
-[`examples/arena`](examples/arena) is **Coin Rush**, a complete game in about 600 lines. You grab coins and dash into people to knock theirs loose. It has a lobby UI, bots, client-side prediction with reconciliation, and interpolation.
-
-```bash
-pnpm install
-```
-
-```bash
-pnpm dev
-```
-
-Open the Vite URL, create a room and hit Start. The example ships with three bots. To play against yourself, open a private window, which gets a separate session.
-
-The project website lives in [`site`](site): a landing page plus Coin Rush at `/play/`, deployed as one Worker. Run it with `pnpm site`, and deploy it with `pnpm run deploy`.
 
 ## Setup
 
@@ -202,6 +251,22 @@ pnpm test
 - **Binary encoding.** It's JSON everywhere; deltas keep it small, but a MessagePack or bit-packed codec would plug in at `send`.
 - **Regions and skill-based matching.** The directory is one global object, and quick-match picks the fullest room.
 - **Spectators.**
+
+## Multiplayer games made with Cloudflare
+
+These are my Cloudflare multiplayer projects, not a claim that every game uses lobbyboi:
+
+| Game | Play |
+| --- | --- |
+| Command Prompt — space RTS (in development) | [Play](https://voidfront-rts.waltissomewhere.workers.dev) |
+| Slopdivers — co-op shooter (in development) | [Play](https://slopdivers.walt.online/) |
+| Pew Pew — isometric bullet hell | [Play](https://pewpew.walt.online) |
+| Clanker Arena — browser FPS | [Play](https://shoot.walt.online/) |
+| Kapoot — multiplayer quizzes | [Play](https://quiz.walt.online) |
+| Vroomba — voice-controlled racing | [Play](https://vroomba.waltissomewhere.workers.dev/) |
+| Prompt of the Dead — desktop and mobile zombie shooter | [Play](https://zombie.walt.online) |
+
+[More of my work](https://walt.online/work).
 
 ## License
 

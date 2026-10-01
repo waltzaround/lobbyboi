@@ -1,20 +1,20 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>lobbyboi · Multiplayer rooms for Durable Objects</title>
+    <title>lobbyboi · Multiplayer for vibe coders</title>
     <meta
       name="description"
-      content="Lobbies, quick-match, authoritative netcode and bots for Cloudflare Durable Objects. You write the game; lobbyboi runs the room."
+      content="Vibe code a game your friends can join. Copy a prompt for your coding agent and add multiplayer rooms, matchmaking and bots with lobbyboi."
     />
-    <meta property="og:title" content="lobbyboi · Multiplayer rooms for Durable Objects" />
-    <meta property="og:description" content="Lobbies, quick-match, authoritative netcode and bots for Cloudflare Durable Objects." />
+    <meta property="og:title" content="lobbyboi · Multiplayer for vibe coders" />
+    <meta property="og:description" content="Copy a prompt. Give it to your coding agent. Build a multiplayer game with lobbyboi." />
     <link rel="icon" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400..800&family=JetBrains+Mono:wght@400;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;450;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
       rel="stylesheet"
     />
   </head>
@@ -26,77 +26,152 @@
           lobbyboi
         </a>
         <nav class="nav-links">
-          <a href="#features">Features</a>
-          <a href="#netcode">Netcode</a>
-          <a href="#start">Get started</a>
+          <a href="#prerequisites">Before you start</a>
+          <a href="#agent-prompt">Agent prompt</a>
+          <a href="#start">How it works</a>
           <a href="https://github.com/waltzaround/lobbyboi">GitHub</a>
-          <a href="/play/" class="button small">Play the demo</a>
+          <a href="#games" class="button small">Play the games</a>
         </nav>
       </div>
     </header>
 
     <main>
-      <section class="hero wrap">
+      <section class="hero wrap" id="intro">
         <div class="hero-copy">
-          <p class="eyebrow">For Cloudflare Durable Objects</p>
-          <h1>Multiplayer rooms, <span class="mark">minus the plumbing</span>.</h1>
+
+          <h1>Add multiplayer to your browser game.</h1>
           <p class="lede">
-            Lobbies, quick-match, reconnects, authoritative netcode and bots in one small TypeScript package.
-            You write <code>createGame</code>, <code>step</code> and <code>view</code>. lobbyboi runs the room.
+            Copy the prompt into your coding agent to add shared rooms, matchmaking and live game updates.
+            lobbyboi runs your multiplayer server on Cloudflare.
           </p>
           <div class="actions">
-            <a href="/play/" class="button">Play Coin Rush</a>
-            <a href="https://github.com/waltzaround/lobbyboi" class="button ghost">Read the docs</a>
+            <button type="button" class="button" data-copy="#multiplayer-prompt">Copy the multiplayer prompt <span aria-hidden="true">↗</span></button>
+            <a href="#games" class="button ghost">Explore the games ↓</a>
           </div>
-          <p class="fine">MIT licensed · no runtime dependencies</p>
+          <p class="fine">Open source · TypeScript · Runs on Cloudflare</p>
         </div>
 
-        <div class="code-card" data-tabs>
-          <div class="tabs" role="tablist">
-            <button role="tab" aria-selected="true" data-tab="server">worker.ts</button>
-            <button role="tab" aria-selected="false" data-tab="client">client.ts</button>
+        <figure class="connection-map" aria-label="Multiplayer architecture: three players connect through a Cloudflare Worker, which checks their sessions and routes connections to one GameRoom Durable Object. The room processes player inputs and sends game snapshots back to everyone.">
+          <canvas id="connections" aria-hidden="true"></canvas>
+          <figcaption><span class="map-dot"></span> Illustrated flow · not a live session</figcaption>
+          <button type="button" class="motion-toggle" id="motion-toggle" aria-pressed="false">Pause motion</button>
+        </figure>
+      </section>
+
+      <section class="wrap prompt-section" id="build">
+        <div class="chapter-copy">
+
+          <h2>One prompt.<br />A whole new way<br />to play.</h2>
+          <p>You bring the idea. Your agent writes the game logic. lobbyboi takes care of the rooms, the players and everything that keeps them connected.</p>
+          <p>New to this? You’ll need a coding agent and a Cloudflare account to put your game online. <a href="#prerequisites">Start with the setup checklist below</a>, then come back and copy the prompt.</p>
+          <a class="text-link" href="/llms.txt">A field guide for your agent <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="prompt-card" id="agent-prompt">
+          <div class="prompt-heading"><span class="prompt-dot" aria-hidden="true"></span> Your next prompt <span class="prompt-format">PLAIN TEXT</span></div>
+          <div class="prompt-intro"><h2>“Make it multiplayer.”</h2><p>Copy this into your coding agent with your game project open.</p></div>
+          <textarea id="multiplayer-prompt" class="prompt-text" aria-label="Multiplayer integration prompt" readonly spellcheck="false">Add multiplayer to my browser game using lobbyboi.
+
+Read https://lobbyboi.walt.online/llms.txt first, then follow the linked API reference and working Coin Rush example. Inspect my project and adapt to its framework and package manager.
+
+Assume I am new to development. Before making changes, explain what I need and check what is already installed. Tell me I need a Cloudflare account to put the game online, link to https://dash.cloudflare.com/sign-up, and walk me through signup and login when needed. Explain Node.js, Git, the package manager and Wrangler in plain language. Give me one setup step at a time, with the command, where to run it and what success looks like. Use Wrangler’s local runtime for testing on my computer.
+
+Keep the existing game and visual style. Add guest names, create/join with a room code, quick-match, ready-up, a countdown, results and play again. Use lobbyboi for room management and connections.
+
+Implement server-authoritative game rules with GameRoom and connect the UI with LobbyClient. Validate inputs, handle reconnects, and add bots and smooth remote movement where appropriate.
+
+Set up the Cloudflare Worker, Durable Object bindings and a local session secret. Document production secret setup. Run locally and verify two separate player sessions can join, play, disconnect and rejoin. Run the build and relevant checks, then explain how to deploy and anything still unverified.</textarea>
+          <div class="prompt-footer">
+            <button type="button" class="button" data-copy="#multiplayer-prompt">Copy prompt</button>
+            <a href="/llms.txt">Read the agent guide ↗</a>
           </div>
-          <pre data-panel="server"><code>import { GameRoom, createLobby } from 'lobbyboi/server';
+        </div>
+      </section>
 
-export class TagRoom extends GameRoom&lt;State, Input&gt; {
-  static config = { maxPlayers: 8, tickHz: 30 };
+      <section class="wrap workflow" aria-label="From prompt to multiplayer">
+        <article><h2>Start with your game</h2><p>A prototype, a weekend idea, that thing you just vibe coded. Open it in your coding agent.</p></article>
+        <article><h2>Give your agent the prompt</h2><p>It gets the docs, a working example and a checklist for wiring multiplayer into your project.</p></article>
+        <article><h2>Bring a friend</h2><p>Test locally, deploy to Cloudflare, then share a room code. Add bots while you wait for the crew.</p></article>
+      </section>
+      <p class="wrap setup-note">Before you start: <a href="https://dash.cloudflare.com/sign-up">sign up for Cloudflare</a> to host your game online, and open your game project in a coding agent. Testing only on your computer? You can do that before setting up hosting.</p>
 
-  createGame(ctx) {
-    return spawn(ctx.players); // bots included
-  }
-  step(state, ctx) {
-    for (const [id, input] of ctx.inputs)
-      move(state, id, input, ctx.dt);
-    if (ctx.tick &gt; 1800) return { winner: leader(state) };
-  }
-  view(state, playerId) {
-    return { players: state.players };
-  }
-  botInput(state, botId) {
-    return chaseNearest(state, botId);
-  }
-}
+      <section id="prerequisites" class="wrap section prerequisites" data-tabs>
 
-const lobby = createLobby({ rooms: 'ROOMS' });</code></pre>
-          <pre data-panel="client" hidden><code>import { LobbyClient, Interpolator } from 'lobbyboi/client';
+        <h2>First time doing this?<br />Start here.</h2>
+        <p class="section-lede">Choose how you’re building your game. We’ll show you the accounts, tools and next steps for that path.</p>
+        <div class="setup-tabs" role="tablist" aria-label="Choose your development setup">
+          <button type="button" role="tab" id="setup-local-tab" aria-controls="setup-local" aria-selected="false" tabindex="-1" data-tab="local">Local development<span>Cursor · Codex · Claude Code</span></button>
+          <button type="button" role="tab" id="setup-builder-tab" aria-controls="setup-builder" aria-selected="true" data-tab="builder">All-in-one builders<span>Lovable &amp; similar tools</span></button>
+        </div>
+        <div id="setup-local" role="tabpanel" aria-labelledby="setup-local-tab" tabindex="0" data-panel="local" hidden>
+        <p class="setup-path-intro">You’re working with files on your computer. Open your game’s folder in Cursor, Codex or Claude Code, then let your agent guide you through the checklist.</p>
+        <div class="features requirements">
+          <article><h3>1. Sign up for Cloudflare</h3><p>Cloudflare runs the online part of your game so friends can connect from their own computers. <strong>You’ll need your own Cloudflare account to put your game online.</strong> Create an account and finish the signup steps. You can try the demo locally first.</p><a class="text-link" href="https://dash.cloudflare.com/sign-up">Create your Cloudflare account ↗</a></article>
+          <article><h3>2. Open Cursor, Codex or Claude Code</h3><p>Install and sign in to the coding tool you want to use. It needs access to your game’s files and permission to run the setup commands. Open your game’s folder in it, then paste the multiplayer prompt above. Tell it you’re a beginner and want help with setup.</p></article>
+          <article><h3>3. Install Node.js</h3><p>Node.js lets your computer run the tools that build and preview your game. Download the <a href="https://nodejs.org/en/download">current LTS installer</a> and follow its steps (this repo needs 22.12+). It also installs npm, which downloads other tools. Reopen your terminal after installing.</p></article>
+          <article><h3>4. Install Git</h3><p>Git downloads a copy of the lobbyboi example onto your computer and tracks changes to code. <a href="https://git-scm.com/downloads">Download Git for your operating system</a> and follow the installer. You don’t need a GitHub account to download this public example.</p></article>
+          <article><h3>5. Install pnpm</h3><p>pnpm downloads the code packages the example needs. After installing Node.js, open your terminal and run <code>npm install -g pnpm@9.13.2</code>. If you’re adding multiplayer to your own game, your agent should keep the package manager that game already uses.</p></article>
+          <article><h3>6. Let the project install Wrangler</h3><p>Wrangler is Cloudflare’s command-line tool. It runs a practice version of your multiplayer server on your computer and publishes it when you’re ready. The example installs it when you run <code>pnpm install</code> below. You don’t need to install it separately.</p></article>
+        </div>
+        <div class="beginner-note">
+          <h3>What’s a terminal?</h3>
+          <p>It’s an app where you type commands. On macOS, open Terminal; on Windows, open PowerShell. Your code editor may also have a Terminal panel. Paste one line at a time, press Enter, and wait for it to finish before running the next. If you see an error, paste it into your coding agent and ask for help.</p>
+        </div>
+        <div class="local-start">
+          <div>
+            <h3>Try the example on your computer</h3>
+            <p>Once Node.js and Git are installed, run these commands in order. They install pnpm, download the example, open its folder, install its dependencies and start it. Leave the terminal running, then open <a href="http://localhost:5180">localhost:5180</a> for the site or <a href="http://localhost:5180/play/">/play/</a> for Coin Rush. “localhost” means this is running on your own computer; friends on other computers can’t use that address.</p>
+            <p>The dev script starts Vite and Wrangler and creates a local <code>SESSION_SECRET</code> in <code>site/.dev.vars</code>. Keep that file private. Open a private browser window for a second player; normal tabs share a session.</p>
+            <p>Just want the standalone game? Use <code>pnpm dev</code> instead and open the Vite URL printed in your terminal.</p>
+          </div>
+          <div class="local-commands">
+            <div class="command-heading"><span>Terminal</span><button type="button" class="copy" data-copy="#local-cmd">Copy commands</button></div>
+            <pre><code id="local-cmd">npm install -g pnpm@9.13.2
+git clone https://github.com/waltzaround/lobbyboi.git
+cd lobbyboi
+pnpm install
+pnpm site</code></pre>
+          </div>
+        </div>
+        <details class="deploy-note" open>
+          <summary>Next: put your game online so friends can join</summary>
+          <p>This step is called deploying: uploading your game to Cloudflare so it has a public web address. <a href="https://dash.cloudflare.com/sign-up">Sign up for Cloudflare</a> if you haven’t yet. Ask your agent to walk you through the steps below. You complete the account signup and browser login yourself. These commands are for the lobbyboi example; your agent should adapt them for your own game.</p>
+          <ol>
+            <li>In <code>site/wrangler.jsonc</code>, choose your own Worker <code>name</code> and remove the existing <code>routes</code> entry for <code>lobbyboi.walt.online</code>. Use your workers.dev URL to start.</li>
+            <li>In your terminal, inside the <code>lobbyboi</code> folder you downloaded, run <code>pnpm --filter site exec wrangler login</code> and sign in to your Cloudflare account in the browser window that opens. This connects the publishing tool to your account.</li>
+            <li>Run <code>pnpm --filter site exec wrangler secret put SESSION_SECRET</code> and enter a random secret of at least 16 characters. Your local secret isn’t uploaded automatically.</li>
+            <li>Run <code>pnpm run deploy</code> to build and deploy the site and demo to your account. Cloudflare usage limits and charges apply to your account.</li>
+          </ol>
+        </details>
+        </div>
+        <div id="setup-builder" role="tabpanel" aria-labelledby="setup-builder-tab" tabindex="0" data-panel="builder">
+          <p class="setup-path-intro">You’re building in your browser. Start with your builder account and Cloudflare; you don’t need to install local tools just to edit your game there.</p>
+          <div class="features requirements">
+            <article><h3>1. Open your game in your builder</h3><p>Sign in to <a href="https://lovable.dev/">Lovable</a> or your chosen builder and open your game project. You’ll paste the prompt below into its chat. Keep using the builder for your game’s screens and design.</p></article>
+            <article><h3>2. Sign up for Cloudflare</h3><p><strong>You still need your own Cloudflare account.</strong> lobbyboi’s multiplayer server runs on Cloudflare Workers and Durable Objects. Your builder’s Publish button alone doesn’t set that server up.</p><a class="text-link" href="https://dash.cloudflare.com/sign-up">Create your Cloudflare account ↗</a></article>
+            <article><h3>3. Arrange the server setup</h3><p>Ask your builder whether it can create and deploy a Cloudflare Worker with Durable Objects. If it can’t, use its code export or GitHub connection, then have a local coding agent set up the multiplayer backend. For this handoff, <a href="https://github.com/signup">create a GitHub account</a> if needed and follow <a href="https://docs.lovable.dev/integrations/github">Lovable’s GitHub sync guide</a>.</p></article>
+          </div>
+          <div class="beginner-note">
+            <h3>Your game has two parts</h3>
+            <p>The part players see can stay hosted by your builder. The multiplayer server lives on Cloudflare. Your agent needs to connect the two using the server’s web address, allow connections from your game’s address, and test player sessions. Cloudflare login and a server secret are part of that setup. Keep the secret on the server.</p>
+          </div>
+          <div class="local-start builder-start">
+            <div>
+              <h3>Paste this into your builder</h3>
+              <p>This prompt asks it to check what it can actually deploy before starting. If a local setup is needed, switch to the Local development tab for Node.js, Git, pnpm and Wrangler instructions.</p>
+              <p>Once both parts are online, open the game in two separate browser sessions and check that both players can join the same room and play together. Publishing a screen is only part of the setup.</p>
+            </div>
+            <div class="prompt-card">
+              <div class="prompt-intro"><h3>Connect my game to lobbyboi</h3></div>
+              <textarea id="builder-prompt" class="prompt-text" aria-label="All-in-one builder multiplayer prompt" readonly spellcheck="false">Add multiplayer to my existing game using lobbyboi. Read https://lobbyboi.walt.online/llms.txt and its linked API reference first. Preserve my game’s design and existing services.
 
-const lobby = new LobbyClient();
-await lobby.login('Walt');
+I’m a beginner using an all-in-one builder. Explain that I need a Cloudflare account and link to https://dash.cloudflare.com/sign-up. Check whether you can deploy a Cloudflare Worker with Durable Objects. If you cannot, explain exactly which code to export or sync to GitHub and how a local coding agent can deploy the backend. Do not claim multiplayer is ready until that backend is running and tested.
 
-const room = lobby.join(await lobby.quickMatch());
-const others = new Interpolator({ delayMs: 100 });
+Keep the frontend hosted here if supported. Configure LobbyClient with the Cloudflare backend URL and useToken for cross-origin sessions. Configure explicit allowedOrigins for WebSockets and the required HTTP CORS handling, including preflight and the session header. Keep SESSION_SECRET only on the Worker. Verify the package’s installation method from its source instead of assuming an npm release exists.
 
-room.on('room', (info) =&gt; renderLobby(info));
-room.on('snapshot', ({ time, state }) =&gt;
-  others.push(time, state.players));
-
-room.ready();
-setInterval(() =&gt; room.sendInput(readKeys()), 33);
-
-function frame() {
-  draw(others.sample(room.serverTime()));
-  requestAnimationFrame(frame);
-}</code></pre>
+Add guest names, create/join by room code, quick-match, ready-up, countdown, results and play again using server-authoritative game logic. Test two independent player sessions, reconnects, and the published frontend URL. Walk me through account setup and any handoff one step at a time, and clearly list anything unverified.</textarea>
+              <div class="prompt-footer"><button type="button" class="button" data-copy="#builder-prompt">Copy builder prompt</button><a href="/llms.txt">Read the agent guide ↗</a></div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -108,8 +183,9 @@ function frame() {
       </section>
 
       <section id="features" class="wrap section">
-        <h2>Everything around the game loop</h2>
-        <p class="section-lede">The parts every multiplayer game needs and nobody wants to write twice.</p>
+
+        <h2>A lot happens<br />between players.</h2>
+        <p class="section-lede">Give your agent a foundation for the rooms, connections and match flow around your game.</p>
         <div class="features">
           <article>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10" /></svg>
@@ -128,12 +204,12 @@ function frame() {
           </article>
           <article>
             <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3" /><path d="M9 12h6M12 9v6" /></svg>
-            <h3>Authoritative netcode</h3>
+            <h3>One shared source of truth</h3>
             <p>A fixed-step server tick with sequenced, validated, rate-limited inputs. Every snapshot carries an <code>ack</code> so clients can predict and reconcile.</p>
           </article>
           <article>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17l5-5 4 4 7-7" /><path d="M15 9h5v5" /></svg>
-            <h3>Delta snapshots</h3>
+            <h3>Send only what changed</h3>
             <p>Per-connection, per-entity, per-field diffs. A moving player costs <code>{"x":412}</code>, not the whole world. Keyframes and resync handle lost baselines.</p>
           </article>
           <article>
@@ -145,7 +221,8 @@ function frame() {
       </section>
 
       <section id="netcode" class="wrap section">
-        <h2>See the difference interpolation makes</h2>
+
+        <h2>A little less jitter.<br />A lot more play.</h2>
         <p class="section-lede">
           Snapshots arrive late, in bursts, or not at all. The left side draws each one as it lands. The right side
           runs the same packets through lobbyboi’s <code>Interpolator</code>. The dashed ring is where the server
@@ -232,8 +309,58 @@ function frame() {
       </section>
 
       <section id="start" class="wrap section">
-        <h2>Get started</h2>
-        <p class="section-lede">Three files. The full reference is in the <a href="https://github.com/waltzaround/lobbyboi#reference">README</a>.</p>
+
+        <h2>Small API.<br />Room for your ideas.</h2>
+        <p class="section-lede">Your agent writes the game hooks and connects your UI. Peek at the shape of the code below, or explore the full <a href="https://github.com/waltzaround/lobbyboi#reference">README</a>.</p>
+        <div class="implementation-example">
+        <div class="code-card" data-tabs>
+          <div class="tabs" role="tablist">
+            <button role="tab" aria-selected="true" data-tab="server">worker.ts</button>
+            <button role="tab" aria-selected="false" data-tab="client">client.ts</button>
+          </div>
+          <pre data-panel="server"><code>import { GameRoom, createLobby } from 'lobbyboi/server';
+
+export class TagRoom extends GameRoom&lt;State, Input&gt; {
+  static config = { maxPlayers: 8, tickHz: 30 };
+
+  createGame(ctx) {
+    return spawn(ctx.players); // bots included
+  }
+  step(state, ctx) {
+    for (const [id, input] of ctx.inputs)
+      move(state, id, input, ctx.dt);
+    if (ctx.tick &gt; 1800) return { winner: leader(state) };
+  }
+  view(state, playerId) {
+    return { players: state.players };
+  }
+  botInput(state, botId) {
+    return chaseNearest(state, botId);
+  }
+}
+
+const lobby = createLobby({ rooms: 'ROOMS' });</code></pre>
+          <pre data-panel="client" hidden><code>import { LobbyClient, Interpolator } from 'lobbyboi/client';
+
+const lobby = new LobbyClient();
+await lobby.login('Walt');
+
+const room = lobby.join(await lobby.quickMatch());
+const others = new Interpolator({ delayMs: 100 });
+
+room.on('room', (info) =&gt; renderLobby(info));
+room.on('snapshot', ({ time, state }) =&gt;
+  others.push(time, state.players));
+
+room.ready();
+setInterval(() =&gt; room.sendInput(readKeys()), 33);
+
+function frame() {
+  draw(others.sample(room.serverTime()));
+  requestAnimationFrame(frame);
+}</code></pre>
+        </div>
+        </div>
         <div class="steps">
           <div class="step">
             <h3><span>1</span> Bind the objects</h3>
@@ -282,21 +409,58 @@ room.sendInput({ x: 1, y: 0 });</code></pre>
         </div>
       </section>
 
-      <section class="cta">
-        <canvas id="arena" aria-hidden="true"></canvas>
-        <div class="cta-copy wrap">
-          <h2>Coin Rush is built on lobbyboi</h2>
-          <p>Grab coins, dash into people to knock theirs loose. Quick-match in, or make a room and send a friend the code.</p>
-          <a href="/play/" class="button">Play now</a>
+      <section id="games" class="wrap section games-showcase">
+        <h2>Made for playing.<br />Better with friends.</h2>
+        <p class="section-lede">A collection of multiplayer games I’ve made with Cloudflare. Pick one, send a friend the link, and jump in.</p>
+        <div class="games-grid">
+          <a class="game-card" href="https://voidfront-rts.waltissomewhere.workers.dev" target="_blank" rel="noopener noreferrer" aria-label="Play Command Prompt (opens in a new tab)">
+            <div class="game-image"><img src="/games/command-prompt.png" alt="Command Prompt gameplay" loading="lazy" decoding="async" /><span class="game-status">In development</span></div>
+            <div class="game-title"><h3>Command Prompt</h3><span aria-hidden="true">↗</span></div>
+            <p>Build a base, command a fleet and battle across space.</p>
+          </a>
+          <a class="game-card" href="https://slopdivers.walt.online/" target="_blank" rel="noopener noreferrer" aria-label="Play Slopdivers (opens in a new tab)">
+            <div class="game-image"><img src="/games/slopdivers.png" alt="Slopdivers gameplay" loading="lazy" decoding="async" /><span class="game-status">In development</span></div>
+            <div class="game-title"><h3>Slopdivers</h3><span aria-hidden="true">↗</span></div>
+            <p>Drop into a 16-player co-op shooter and get your squad out alive.</p>
+          </a>
+          <a class="game-card" href="https://pewpew.walt.online" target="_blank" rel="noopener noreferrer" aria-label="Play Pew Pew (opens in a new tab)">
+            <div class="game-image"><img src="/games/pewpew.webp" alt="Pew Pew gameplay" loading="lazy" decoding="async" /></div>
+            <div class="game-title"><h3>Pew Pew</h3><span aria-hidden="true">↗</span></div>
+            <p>Three-minute bullet-hell battles with friends, bots and five guns.</p>
+          </a>
+          <a class="game-card" href="https://shoot.walt.online/" target="_blank" rel="noopener noreferrer" aria-label="Play Clanker Arena (opens in a new tab)">
+            <div class="game-image"><img src="/games/clanker.webp" alt="Clanker Arena gameplay" loading="lazy" decoding="async" /></div>
+            <div class="game-title"><h3>Clanker Arena</h3><span aria-hidden="true">↗</span></div>
+            <p>A browser FPS with player-versus-player and player-versus-enemy modes.</p>
+          </a>
+          <a class="game-card" href="https://quiz.walt.online" target="_blank" rel="noopener noreferrer" aria-label="Play Kapoot (opens in a new tab)">
+            <div class="game-image"><img src="/games/kapoot.webp" alt="Kapoot gameplay" loading="lazy" decoding="async" /></div>
+            <div class="game-title"><h3>Kapoot</h3><span aria-hidden="true">↗</span></div>
+            <p>Make a quiz, bring your friends and see who knows the most.</p>
+          </a>
+          <a class="game-card" href="https://vroomba.waltissomewhere.workers.dev/" target="_blank" rel="noopener noreferrer" aria-label="Play Vroomba (opens in a new tab)">
+            <div class="game-image"><img src="/games/vroomba.webp" alt="Vroomba gameplay" loading="lazy" decoding="async" /></div>
+            <div class="game-title"><h3>Vroomba</h3><span aria-hidden="true">↗</span></div>
+            <p>Race your friends using your voice to control your car.</p>
+          </a>
+          <a class="game-card" href="https://zombie.walt.online" target="_blank" rel="noopener noreferrer" aria-label="Play Prompt of the Dead (opens in a new tab)">
+            <div class="game-image"><img src="/games/zombie.webp" alt="Prompt of the Dead gameplay" loading="lazy" decoding="async" /></div>
+            <div class="game-title"><h3>Prompt of the Dead</h3><span aria-hidden="true">↗</span></div>
+            <p>An isometric zombie shooter for players on desktop and mobile.</p>
+          </a>
         </div>
+        <a href="https://walt.online/work" class="text-link">More of my work ↗</a>
       </section>
     </main>
 
     <footer class="wrap footer">
       <span>lobbyboi · MIT licensed</span>
+      <a href="https://walt.online">Made by Walter Lim</a>
+      <a href="/llms.txt">For agents</a>
       <a href="https://github.com/waltzaround/lobbyboi">GitHub</a>
     </footer>
 
+    <p id="copy-status" class="sr-only" role="status" aria-live="polite"></p>
     <script type="module" src="/src/landing.ts"></script>
   </body>
 </html>
