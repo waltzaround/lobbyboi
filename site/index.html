@@ -3,13 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>lobbyboi · Multiplayer for vibe coders</title>
-    <meta
-      name="description"
-      content="Vibe code a game your friends can join. Copy a prompt for your coding agent and add multiplayer rooms, matchmaking and bots with lobbyboi."
-    />
-    <meta property="og:title" content="lobbyboi · Multiplayer for vibe coders" />
-    <meta property="og:description" content="Copy a prompt. Give it to your coding agent. Build a multiplayer game with lobbyboi." />
+    <title>Add Multiplayer to Your Browser Game | lobbyboi</title>
+    <meta name="description" content="Add multiplayer rooms, matchmaking and live game updates to your browser game with lobbyboi. Open-source TypeScript for Cloudflare, with coding agent prompts." />
+    <link rel="canonical" href="https://lobbyboi.walt.online/" />
+    <meta name="author" content="Walter Lim" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="lobbyboi" />
+    <meta property="og:title" content="Add Multiplayer to Your Browser Game | lobbyboi" />
+    <meta property="og:description" content="Add multiplayer rooms, matchmaking and live game updates to your browser game with lobbyboi. Open-source TypeScript for Cloudflare, with coding agent prompts." />
+    <meta property="og:url" content="https://lobbyboi.walt.online/" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Add Multiplayer to Your Browser Game | lobbyboi" />
+    <meta name="twitter:description" content="Add multiplayer rooms, matchmaking and live game updates to your browser game with lobbyboi. Open-source TypeScript for Cloudflare, with coding agent prompts." />
     <link rel="icon" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,6 +22,52 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;450;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
       rel="stylesheet"
     />
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://lobbyboi.walt.online/#website",
+      "name": "lobbyboi",
+      "url": "https://lobbyboi.walt.online/"
+    },
+    {
+      "@type": "Person",
+      "@id": "https://walt.online/#person",
+      "name": "Walter Lim",
+      "url": "https://walt.online"
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "@id": "https://lobbyboi.walt.online/#software",
+      "name": "lobbyboi",
+      "description": "Add multiplayer rooms, matchmaking and live game updates to your browser game with lobbyboi. Open-source TypeScript for Cloudflare, with coding agent prompts.",
+      "url": "https://lobbyboi.walt.online/",
+      "codeRepository": "https://github.com/waltzaround/lobbyboi",
+      "programmingLanguage": "TypeScript",
+      "runtimePlatform": "Cloudflare Workers and Durable Objects",
+      "license": "https://github.com/waltzaround/lobbyboi/blob/main/LICENSE",
+      "author": {
+        "@id": "https://walt.online/#person"
+      }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://lobbyboi.walt.online/#webpage",
+      "url": "https://lobbyboi.walt.online/",
+      "name": "Add Multiplayer to Your Browser Game | lobbyboi",
+      "description": "Add multiplayer rooms, matchmaking and live game updates to your browser game with lobbyboi. Open-source TypeScript for Cloudflare, with coding agent prompts.",
+      "isPartOf": {
+        "@id": "https://lobbyboi.walt.online/#website"
+      },
+      "mainEntity": {
+        "@id": "https://lobbyboi.walt.online/#software"
+      }
+    }
+  ]
+}
+    </script>
   </head>
   <body>
     <header class="nav">
@@ -42,7 +93,7 @@
           <h1>Add multiplayer to your browser game.</h1>
           <p class="lede">
             Copy the prompt into your coding agent to add shared rooms, matchmaking and live game updates.
-            lobbyboi runs your multiplayer server on Cloudflare.
+            lobbyboi is an open-source TypeScript library for multiplayer games on Cloudflare Workers and Durable Objects.
           </p>
           <div class="actions">
             <button type="button" class="button" data-copy="#multiplayer-prompt">Copy the multiplayer prompt <span aria-hidden="true">↗</span></button>
@@ -407,6 +458,15 @@ room.sendInput({ x: 1, y: 0 });</code></pre>
           <code id="secret-cmd">npx wrangler secret put SESSION_SECRET</code>
           <button class="copy" data-copy="#secret-cmd">Copy</button>
         </div>
+      </section>
+
+      <section id="questions" class="wrap section questions">
+        <h2>Browser multiplayer, explained.</h2>
+        <details class="deploy-note"><summary>How do I add multiplayer to my browser game?</summary><p>Give your coding agent the <a href="#agent-prompt">lobbyboi integration prompt</a>. It guides the agent through adding rooms, player connections and server-side game rules to your existing project. Use the <a href="#prerequisites">setup guide</a> for local tools or all-in-one builders.</p></details>
+        <details class="deploy-note"><summary>Do I need a Cloudflare account?</summary><p>Yes, to host your multiplayer server online. lobbyboi uses Cloudflare Workers and Durable Objects. You can test the example on your computer with Wrangler’s local runtime before deploying.</p></details>
+        <details class="deploy-note"><summary>Can I use lobbyboi with Lovable?</summary><p>Your frontend can stay in Lovable if it supports the integration. The multiplayer backend still needs to be deployed to Cloudflare. If your builder cannot deploy it, export or sync your code and have a local coding agent set up the backend. The <a href="#prerequisites">builder setup guide</a> explains the steps.</p></details>
+        <details class="deploy-note"><summary>Is lobbyboi free?</summary><p>The library is open source under the <a href="https://github.com/waltzaround/lobbyboi/blob/main/LICENSE">MIT license</a>. Cloudflare hosting and your coding tool have their own usage limits and pricing.</p></details>
+        <details class="deploy-note"><summary>Is there a working multiplayer example?</summary><p><a href="/play/">Play the Coin Rush example</a> or read its <a href="https://github.com/waltzaround/lobbyboi/tree/main/examples/arena">source code</a>. It demonstrates rooms, bots, player movement and reconnects.</p></details>
       </section>
 
       <section id="games" class="wrap section games-showcase">
