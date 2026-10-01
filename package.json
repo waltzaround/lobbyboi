@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "pnpm --filter arena dev",
     "site": "pnpm --filter site dev",
-    "deploy": "pnpm --filter site deploy",
+    "deploy": "pnpm --filter site run deploy",
     "build": "pnpm -r build",
     "test": "pnpm --filter lobbyboi test",
     "typecheck": "pnpm -r typecheck"
